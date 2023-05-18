@@ -9,7 +9,9 @@ const  PerceptronClassifier = () => {
   const [classLabels, setClassLabels] = useState([1,2,3,4]);
   const [weights, setWeights] = useState([]);
   const [decisionBoundaries, setDecisionBoundaries] = useState([]);
-  const [performance, setPerformance] = useState([]);
+  const [SSE, setSSE] = useState(0);
+  const [MSE, setMSE] = useState(0);
+
   const [selectedLabel, setSelectedLabel] = useState(1);
 
 
@@ -58,61 +60,47 @@ const  PerceptronClassifier = () => {
   };
 
   const sigmoid = (z) => 1 / (1 + Math.exp(-z));
-
   const trainModel = () => {
     const uniqueLabels = [...new Set(dataPoints.map(({ label }) => label))];
     setClassLabels(uniqueLabels);
-  
+
     const n = dataPoints.length;
     const m = uniqueLabels.length;
     const weights = [];
-    const convergenceThreshold = 0.001;
-  
-    const calculateCost = (theta, X, y) => {
-      const h = X.map((row) => sigmoid(row.reduce((acc, val, i) => acc + val * theta[i], 0)));
-      const term1 = y.map((val, i) => (val === 1 ? -Math.log(h[i]) : 0));
-      const term2 = y.map((val, i) => (val === 0 ? -Math.log(1 - h[i]) : 0));
-      return (1 / n) * (term1.reduce((acc, val) => acc + val, 0) + term2.reduce((acc, val) => acc + val, 0));
-    };
-  
-    for (let i = 0; i < m; i++) {
+    let sse =0;
+
+    for (let i = 0; i <m; i++) {
       const label = uniqueLabels[i];
       const labelData = dataPoints.map(({ x, y, label: pointLabel }) => [1, x, y, pointLabel === label ? 1 : 0]);
       const labelWeights = [0, 0, 0];
       const labelX = labelData.map((row) => row.slice(0, 3));
       const labelY = labelData.map((row) => row[3]);
-  
       for (let iteration = 0; iteration < maxIterations; iteration++) {
-        const cost = calculateCost(labelWeights, labelX, labelY);
-  
         for (let j = 0; j < n; j++) {
           const predicted = sigmoid(labelWeights.reduce((acc, val, k) => acc + val * labelX[j][k], 0));
           const error = labelY[j] - predicted;
-  
+    
           labelWeights[0] += learningRate * error;
           labelWeights[1] += learningRate * error * labelX[j][1];
           labelWeights[2] += learningRate * error * labelX[j][2];
-        }
-  
-        const updatedCost = calculateCost(labelWeights, labelX, labelY);
-  
-        // Check if the cost has converged (optional termination condition)
-        if (Math.abs(updatedCost - cost) < convergenceThreshold) {
-          break;
+          sse += error ^ 2;
         }
       }
-  
+    
       const decisionBoundary = {
         start: { x: 0, y: -(labelWeights[0] + labelWeights[1] * 0) / labelWeights[2] },
         end: { x: canvasRef.current.width, y: -(labelWeights[0] + labelWeights[1] * canvasRef.current.width) / labelWeights[2] },
       };
-  
+    
       weights.push(labelWeights);
       setDecisionBoundaries((prevDecisionBoundaries) => [...prevDecisionBoundaries, decisionBoundary]);
     }
-  
-    setWeights(weights);
 
+    const mse = sse / (n * m);
+    setSSE(sse)
+    setMSE(mse)
+    
+    setWeights(weights);
   };
   
 
@@ -120,6 +108,8 @@ const  PerceptronClassifier = () => {
     setDataPoints([]);
     setDecisionBoundaries([]);
     setSelectedLabel(1);
+    setSSE(0)
+    setMSE(0)
   };
 
   return (
@@ -172,10 +162,18 @@ const  PerceptronClassifier = () => {
 <div className='button-container'>
 <button className='train-button' onClick={trainModel}>Train</button>
 <button className='clear-button' onClick={clear}>Clear</button>
-
 </div>
 </div>
   </div>
+
+  <div>
+<div>
+        SSE: {SSE}
+      </div>
+      <div>
+        MSE: {MSE}
+      </div>
+</div>
 
   </div>
   );
