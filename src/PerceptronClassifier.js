@@ -134,6 +134,7 @@ const PerceptronClassifier = () => {
             boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
           }}
         />
+        <div className='settings-metrics-container'>
         <div className="settings-container">
           <div className="setting-row">
             <label className="setting-label" htmlFor="learningRateInput">
@@ -186,10 +187,11 @@ const PerceptronClassifier = () => {
             </button>
           </div>
         </div>
-      </div>
-      <div>
-        <div>SSE: {SSE}</div>
-        <div>MSE: {MSE}</div>
+        <div className="metrics-container">
+          <div>SSE: {SSE}</div>
+          <div>MSE: {MSE}</div>
+        </div>
+        </div>
       </div>
     </div>
   );
