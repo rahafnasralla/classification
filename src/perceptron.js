@@ -1,4 +1,4 @@
-function perceptronLearning(data, classes, learningRate, maxIterations) {
+function perceptron(data, classes, learningRate, maxIterations) {
 
     function Random() {
         return Math.random() - 0.5;
@@ -48,14 +48,14 @@ function perceptronLearning(data, classes, learningRate, maxIterations) {
     const classifiers = [];
     if ( uniqueclasses.length === 2) {
         const binaryClasses = classes.map((class_) => (class_ === uniqueclasses[0] ? 1 : -1));
-        const { weights, threshold } = perceptronLearning(data, binaryClasses, learningRate, maxIterations);
+        const { weights, threshold } = perceptron(data, binaryClasses, learningRate, maxIterations);
         classifiers.push({ class_: uniqueclasses[0], weights, threshold });
       } else {
-        
+
     for (let i = 0; i < uniqueclasses.length; i++) {
       const currentclass_ = uniqueclasses[i];
       const binaryclasses = classes.map((class_) => (class_ === currentclass_ ? 1 : -1));
-      const { weights, threshold } = perceptronLearning(data, binaryclasses, learningRate, maxIterations);
+      const { weights, threshold } = perceptron(data, binaryclasses, learningRate, maxIterations);
       classifiers.push({ class_: currentclass_, weights, threshold });
     }
 }
