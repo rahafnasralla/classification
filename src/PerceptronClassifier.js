@@ -98,7 +98,7 @@ const PerceptronClassifier = () => {
         for (let k = 0; k < dataPoints.length; k++) {
           const point = dataPoints[k];
           const prediction = predict([point.x, point.y], weightsA, thresholdA) === 1 ? classA : -1;
-          const squaredError = Math.pow(point.label === prediction ? 0 : 1, 2);
+          const squaredError = Math.pow(point.label - prediction , 2);
           sseSum += squaredError;
         }
       }
