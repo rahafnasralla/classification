@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { predict,perceptronLearningOneVsAll } from './perceptron';
+import { predict,OneVsAll } from './perceptron';
 const PerceptronClassifier = () => {
   const canvasRef = useRef(null);
   const [dataPoints, setDataPoints] = useState([]);
@@ -7,7 +7,7 @@ const PerceptronClassifier = () => {
   const [maxIterations, setMaxIterations] = useState(100);
   const [classLabels, setClassLabels] = useState([0, 1, 2, 3]);
   const [weights, setWeights] = useState({});
-  const [decisionBoundaries, setDecisionBoundaries] = useState([]);
+  const [separationLines, setseparationLines] = useState([]);
   const [SSE, setSSE] = useState(0);
   const [MSE, setMSE] = useState(0);
   const [selectedLabel, setSelectedLabel] = useState(0);
@@ -16,10 +16,10 @@ const PerceptronClassifier = () => {
     const canvas = canvasRef.current;
     const context = canvas.getContext('2d');
 
-    // Clear canvas
+    //clear
     context.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw data points
+    //draw data
     dataPoints.forEach(({ x, y, label }) => {
       context.beginPath();
       context.arc(x, y, 3, 0, 2 * Math.PI);
@@ -28,8 +28,8 @@ const PerceptronClassifier = () => {
       context.closePath();
     });
 
-    // Draw decision boundaries
-    decisionBoundaries.forEach((boundary) => {
+    //draw separation lines
+    separationLines.forEach((boundary) => {
       context.beginPath();
       context.moveTo(boundary.start.x, boundary.start.y);
       context.lineTo(boundary.end.x, boundary.end.y);
@@ -38,7 +38,7 @@ const PerceptronClassifier = () => {
       context.stroke();
       context.closePath();
     });
-  }, [dataPoints, decisionBoundaries]);
+  }, [dataPoints, separationLines]);
 
   const handleCanvasClick = (event) => {
     const canvas = canvasRef.current;
@@ -57,7 +57,7 @@ const PerceptronClassifier = () => {
 
   const clear = () => {
     setDataPoints([]);
-    setDecisionBoundaries([]);
+    setseparationLines([]);
     setSelectedLabel(1);
     setSSE(0);
     setMSE(0);
@@ -67,13 +67,11 @@ const PerceptronClassifier = () => {
     const input = dataPoints.map(({ x, y }) => [x, y]);
     const labels = dataPoints.map(({ label }) => label);
   
-    const classifiers = perceptronLearningOneVsAll(input, labels, learningRate, maxIterations);
+    const classifiers = OneVsAll(input, labels, learningRate, maxIterations);
   
-    const newDecisionBoundaries = [];
+    const newseparationLines = [];
     let sseSum = 0;
-  
-    console.log('classifiers:', classifiers);
-  
+    
     for (let i = 0; i < classLabels.length; i++) {
       const classA = classLabels[i];
   
@@ -84,20 +82,19 @@ const PerceptronClassifier = () => {
   
       const classifierA = classifiers[classA];
   
-      console.log('classifierA:', classifierA);
   
       if (classifierA) {
         const weightsA = classifierA.weights;
         const biasA = classifierA.bias;
   
-        // Calculate decision boundary for class A
+        //calculate separation lines
         decisionBoundary.start.x = 0;
         decisionBoundary.start.y = -(biasA / weightsA[1]);
         decisionBoundary.end.x = 600;
         decisionBoundary.end.y = -(weightsA[0] * decisionBoundary.end.x + biasA) / weightsA[1];
-        newDecisionBoundaries.push(decisionBoundary);
+        newseparationLines.push(decisionBoundary);
   
-        // Calculate SSE for class A
+        //calculate SSE
         for (let k = 0; k < dataPoints.length; k++) {
           const point = dataPoints[k];
           const prediction = predict([point.x, point.y], weightsA, biasA) === 1 ? classA : -1;
@@ -110,7 +107,7 @@ const PerceptronClassifier = () => {
     const sse = sseSum / (2 * dataPoints.length);
     const mse = sse / dataPoints.length;
   
-    setDecisionBoundaries(newDecisionBoundaries);
+    setseparationLines(newseparationLines);
     setWeights(classifiers);
     setSSE(sse);
     setMSE(mse);
