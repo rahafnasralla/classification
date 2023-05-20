@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { predict,OneVsAll } from './perceptron';
+import { activate,OneVsAll } from './perceptron';
 
 const PerceptronClassifier = () => {
   const canvasRef = useRef(null);
@@ -93,8 +93,8 @@ const PerceptronClassifier = () => {
   
         for (let k = 0; k < dataPoints.length; k++) {
           const point = dataPoints[k];
-          const prediction = predict([point.x, point.y], weightsA, thresholdA) === 1 ? classA : -1;
-          const squaredError = Math.pow(point.label - prediction , 2);
+          const actual = activate([point.x, point.y], weightsA, thresholdA) === 1 ? classA : -1;
+          const squaredError = Math.pow(point.label - actual , 2);
           sseSum += squaredError;
         }
       }
@@ -139,7 +139,7 @@ const PerceptronClassifier = () => {
               className="setting-input"
               type="number"
               id="learningRateInput"
-              min="0.1"
+              min="0"
               max="1"
               step="0.1"
               value={learningRate}
@@ -155,7 +155,6 @@ const PerceptronClassifier = () => {
               type="number"
               id="maxIterationsInput"
                min="100"
-              max="1000000"
               step="100"
               value={maxIterations}
               onChange={(e) => setMaxIterations(parseInt(e.target.value))}

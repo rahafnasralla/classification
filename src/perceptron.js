@@ -13,14 +13,14 @@ function perceptron(data, classes, learningRate, maxIterations) {
       let errorCount = 0;
   
       for (let i = 0; i < data.length; i++) {
-        const prediction = predict(data[i], weights, threshold);
-        const actual = classes[i];
+        const actual = activate(data[i], weights, threshold);
+        const desired = classes[i];
   
-        if (prediction !== actual) {
+        if (actual !== desired) {
           for (let j = 0; j < weights.length; j++) {
-            weights[j] += learningRate * (actual - prediction) * data[i][j];
+            weights[j] += learningRate * (desired - actual) * data[i][j];
           }
-          threshold += learningRate * (actual - prediction);
+          threshold += learningRate * (desired - actual);
           errorCount++;
         }
       }
@@ -35,7 +35,7 @@ function perceptron(data, classes, learningRate, maxIterations) {
     return { weights, threshold };
   }
   
-  export function predict(input, weights, threshold) {
+  export function activate(input, weights, threshold) {
     let activation = threshold;
     for (let i = 0; i < input.length; i++) {
       activation += input[i] * weights[i];
