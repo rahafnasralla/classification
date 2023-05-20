@@ -1,4 +1,3 @@
-
 // Perceptron Learning Algorithm
 function perceptronLearning(data, labels, learningRate, maxIterations) {
     // Initialize weights and bias
@@ -20,9 +19,9 @@ function perceptronLearning(data, labels, learningRate, maxIterations) {
         // Update weights and bias if prediction is incorrect
         if (prediction !== actual) {
           for (let j = 0; j < weights.length; j++) {
-            weights[j] += learningRate * actual * data[i][j];
+            weights[j] += learningRate * (actual - prediction) * data[i][j];
           }
-          bias += learningRate * actual;
+          bias += learningRate * (actual - prediction);
           errorCount++;
         }
       }
@@ -43,6 +42,7 @@ function perceptronLearning(data, labels, learningRate, maxIterations) {
     const activation = input.reduce((sum, value, index) => sum + value * weights[index], 0) + bias;
     return activation >= 0 ? 1 : -1;
   }
+  
   
   export function perceptronLearningOneVsAll(data, labels, learningRate, maxIterations) {
     const uniqueLabels = [...new Set(labels)];
