@@ -41,7 +41,10 @@ function perceptronLearning(data, classes, learningRate, maxIterations) {
   }
   
   export function predict(input, weights, threshold) {
-    const activation = input.reduce((sum, value, index) => sum + value * weights[index], 0) + threshold;
+    let activation = threshold;
+    for (let i = 0; i < input.length; i++) {
+      activation += input[i] * weights[i];
+    }
     return activation >= 0 ? 1 : -1;
   }
   
