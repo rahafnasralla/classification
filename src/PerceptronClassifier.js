@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { predict,OneVsAll } from './perceptron';
+
 const PerceptronClassifier = () => {
   const canvasRef = useRef(null);
   const [dataPoints, setDataPoints] = useState([]);
@@ -16,10 +17,8 @@ const PerceptronClassifier = () => {
     const canvas = canvasRef.current;
     const context = canvas.getContext('2d');
 
-    //clear
     context.clearRect(0, 0, canvas.width, canvas.height);
 
-    //draw data
     dataPoints.forEach(({ x, y, label }) => {
       context.beginPath();
       context.arc(x, y, 3, 0, 2 * Math.PI);
@@ -28,7 +27,6 @@ const PerceptronClassifier = () => {
       context.closePath();
     });
 
-    //draw separation lines
     separationLines.forEach((boundary) => {
       context.beginPath();
       context.moveTo(boundary.start.x, boundary.start.y);
@@ -87,14 +85,12 @@ const PerceptronClassifier = () => {
         const weightsA = classifierA.weights;
         const thresholdA = classifierA.threshold;
   
-        //calculate separation lines
         decisionBoundary.start.x = 0;
         decisionBoundary.start.y = -(thresholdA / weightsA[1]);
         decisionBoundary.end.x = 600;
         decisionBoundary.end.y = -(weightsA[0] * decisionBoundary.end.x + thresholdA) / weightsA[1];
         newseparationLines.push(decisionBoundary);
   
-        //calculate SSE
         for (let k = 0; k < dataPoints.length; k++) {
           const point = dataPoints[k];
           const prediction = predict([point.x, point.y], weightsA, thresholdA) === 1 ? classA : -1;
@@ -118,23 +114,22 @@ const PerceptronClassifier = () => {
 
   return (
     <div className="container">
-      <h1 className="title">Binary and Multiclass Classification</h1>
-      <div className="canvas-container">
+      <div >
         <canvas
           id="canvas"
-          width={600}
-          height={400}
+          width={700}
+          height={550}
           onClick={handleCanvasClick}
           ref={canvasRef}
           style={{
-            border: '4px solid #4caf50',
+            marginLeft:"100px",
+            border: '4px solid #432c91',
             cursor: 'pointer',
-            borderRadius: '12px',
+            borderRadius: '20px',
             backgroundColor: '#f9f9f9',
             boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
           }}
         />
-        <div className='settings-metrics-container'>
         <div className="settings-container">
           <div className="setting-row">
             <label className="setting-label" htmlFor="learningRateInput">
@@ -144,6 +139,9 @@ const PerceptronClassifier = () => {
               className="setting-input"
               type="number"
               id="learningRateInput"
+              min="0.1"
+              max="1"
+              step="0.1"
               value={learningRate}
               onChange={(e) => setLearningRate(parseFloat(e.target.value))}
             />
@@ -156,24 +154,36 @@ const PerceptronClassifier = () => {
               className="setting-input"
               type="number"
               id="maxIterationsInput"
+               min="100"
+              max="1000000"
+              step="100"
               value={maxIterations}
               onChange={(e) => setMaxIterations(parseInt(e.target.value))}
             />
           </div>
           <div className="setting-row">
-            <label className="setting-label" htmlFor="labelSelect">
-              Select Label:
+            <label className="setting-label" htmlFor="labelSelect" style={{
+              marginRight:"25px"
+            }}>
+              Select Label:    
             </label>
             <select
               className="setting-select"
               id="labelSelect"
               value={selectedLabel}
               onChange={(e) => setSelectedLabel(parseInt(e.target.value))}
+              style={{
+              paddingRight:"10px",
+                paddingLeft: "10px",
+            }}
             >
               <option value="">None</option>
               {classLabels.map((label) => (
-                <option key={label} value={label}>
-                  {label}
+                <option key={label} value={label} style={{
+                    backgroundColor: getColor(label),
+                     color: "white"
+                     }}>
+                  class{label}
                 </option>
               ))}
             </select>
@@ -186,13 +196,14 @@ const PerceptronClassifier = () => {
               Clear
             </button>
           </div>
-        </div>
-        <div className="metrics-container">
-          <div>SSE: {SSE}</div>
-          <div>MSE: {MSE}</div>
-        </div>
+          <div>
+        <div>SSE: {SSE}</div>
+        <div>MSE: {MSE}</div>
+          </div>
+
         </div>
       </div>
+     
     </div>
   );
 };
