@@ -1,13 +1,13 @@
 // Perceptron Learning Algorithm
 function perceptronLearning(data, classes, learningRate, maxIterations) {
-    // Initialize weights and bias
+    // Initialize weights and threshold
 
     function Random() {
         return Math.random() - 0.5;
       }
     
-    let weights = [0,0];
-    let bias = 0;
+    let weights = [Random(),Random()];
+    let threshold = Random();
   
     let iteration = 0;
   
@@ -16,15 +16,15 @@ function perceptronLearning(data, classes, learningRate, maxIterations) {
   
       // Iterate 
       for (let i = 0; i < data.length; i++) {
-        const prediction = predict(data[i], weights, bias);
+        const prediction = predict(data[i], weights, threshold);
         const actual = classes[i];
   
-        // Update weights and bias if prediction is incorrect
+        // Update weights and threshold if prediction is incorrect
         if (prediction !== actual) {
           for (let j = 0; j < weights.length; j++) {
             weights[j] += learningRate * (actual - prediction) * data[i][j];
           }
-          bias += learningRate * (actual - prediction);
+          threshold += learningRate * (actual - prediction);
           errorCount++;
         }
       }
@@ -37,26 +37,30 @@ function perceptronLearning(data, classes, learningRate, maxIterations) {
       iteration++;
     }
   
-    return { weights, bias };
+    return { weights, threshold };
   }
   
-  export function predict(input, weights, bias) {
-    const activation = input.reduce((sum, value, index) => sum + value * weights[index], 0) + bias;
+  export function predict(input, weights, threshold) {
+    const activation = input.reduce((sum, value, index) => sum + value * weights[index], 0) + threshold;
     return activation >= 0 ? 1 : -1;
   }
   
   export function OneVsAll(data, classes, learningRate, maxIterations) {
     const uniqueclasses = [...new Set(classes)];
     const classifiers = [];
-  
+    if ( uniqueclasses.length === 2) {
+        const binaryClasses = classes.map((class_) => (class_ === uniqueclasses[0] ? 1 : -1));
+        const { weights, threshold } = perceptronLearning(data, binaryClasses, learningRate, maxIterations);
+        classifiers.push({ class_: uniqueclasses[0], weights, threshold });
+      } else {
     // Train a perceptron for each class
     for (let i = 0; i < uniqueclasses.length; i++) {
       const currentclass_ = uniqueclasses[i];
       const binaryclasses = classes.map((class_) => (class_ === currentclass_ ? 1 : -1));
-      const { weights, bias } = perceptronLearning(data, binaryclasses, learningRate, maxIterations);
-      classifiers.push({ class_: currentclass_, weights, bias });
+      const { weights, threshold } = perceptronLearning(data, binaryclasses, learningRate, maxIterations);
+      classifiers.push({ class_: currentclass_, weights, threshold });
     }
-  
+}
     return classifiers;
   }
   

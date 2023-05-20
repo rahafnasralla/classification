@@ -85,19 +85,19 @@ const PerceptronClassifier = () => {
   
       if (classifierA) {
         const weightsA = classifierA.weights;
-        const biasA = classifierA.bias;
+        const thresholdA = classifierA.threshold;
   
         //calculate separation lines
         decisionBoundary.start.x = 0;
-        decisionBoundary.start.y = -(biasA / weightsA[1]);
+        decisionBoundary.start.y = -(thresholdA / weightsA[1]);
         decisionBoundary.end.x = 600;
-        decisionBoundary.end.y = -(weightsA[0] * decisionBoundary.end.x + biasA) / weightsA[1];
+        decisionBoundary.end.y = -(weightsA[0] * decisionBoundary.end.x + thresholdA) / weightsA[1];
         newseparationLines.push(decisionBoundary);
   
         //calculate SSE
         for (let k = 0; k < dataPoints.length; k++) {
           const point = dataPoints[k];
-          const prediction = predict([point.x, point.y], weightsA, biasA) === 1 ? classA : -1;
+          const prediction = predict([point.x, point.y], weightsA, thresholdA) === 1 ? classA : -1;
           const squaredError = Math.pow(point.label === prediction ? 0 : 1, 2);
           sseSum += squaredError;
         }
